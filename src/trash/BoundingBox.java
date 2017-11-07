@@ -1,6 +1,8 @@
-package pl.edu.pw.fi.szypula.tomasz;
+package trash;
 
-public class Box2D {
+import pl.edu.pw.fi.szypula.tomasz.Vector2D;
+
+public class BoundingBox {
 	private Vector2D pointMax;
 	private Vector2D pointMin;
 	public Vector2D getPointMin() {
@@ -17,11 +19,11 @@ public class Box2D {
 	}
 	
 	
-	Box2D(Vector2D pointMin,Vector2D pointMax){
+	BoundingBox(Vector2D pointMin, Vector2D pointMax){
 		this.pointMin = pointMin;
 		this.pointMax = pointMax;
 	}
-	public Box2D() {
+	public BoundingBox() {
 		pointMax=new Vector2D();
 		pointMin = new Vector2D();
 	}

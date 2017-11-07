@@ -22,16 +22,23 @@ public class Vector2D {
         this(v.x, v.y);
     }
 
+    public Vector2D(){this(0,0); }
+
     public Vector2D(Vector2D v1, Vector2D v2) {
-        x = v2.x - v1.x;
-        y = v2.y - v1.y;
+        this(v2.x - v1.x, v2.y - v1.y);
     }
-
-    public Vector2D() {
-        x = 0;
-        y = 0;
+    public Vector2D normalize(){
+        double normFactor = getNormFactor();
+        setX(getX()/normFactor);
+        setY(getY()/normFactor);
+        return this;
     }
-
+    private double getNormFactor(){ return Math.sqrt(getLengthSquare());
+    }
+    public void multiplyTomek(Vector2D vector){
+        this.setX(vector.getX()*this.getX());
+        this.setY(vector.getY()*this.getY());
+    }
     public double getX() {
         return x;
     }
@@ -48,4 +55,30 @@ public class Vector2D {
         this.y = y;
     }
 
+
+    public double getLengthSquare() {
+        return getX()*getX() + getY()*getY();
+    }
+
+    public Vector2D addVector2D(Vector2D vector2D){
+        this.setX(this.getX()+vector2D.getX());
+        this.setY(this.getY()+vector2D.getY());
+        return this;
+    }
+    public Vector2D equalsVector2D(Vector2D vector2D){
+        this.setY(vector2D.getY());
+        this.setX(vector2D.getX());
+        return vector2D;
+    }
+
+    public Vector2D multiply(double multiplier) {
+        this.setY(getY()*multiplier);
+        this.setX(getX()*multiplier);
+        return this;
+    }
+
+    public void setPosition(Vector2D vector2D) {
+        setY(vector2D.getY());
+        setX(vector2D.getX());
+    }
 }
