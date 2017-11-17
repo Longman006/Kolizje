@@ -41,8 +41,21 @@ public class EnergyMomentumConservationSolver {
         Vector2D v2NormalPrime = Vector2DMath.multiplyVector2D(nnn,v2nPrime);
         Vector2D v2TransversalPrime = Vector2DMath.multiplyVector2D(sss,v2s);
 
-        ball1.setVelocity(v1NormalPrime.addVector2D(v1TransversalPrime));
-        ball2.setVelocity(v2NormalPrime.addVector2D(v2TransversalPrime));
+        Vector2D wypadkowy1 = Vector2DMath.vector2DSum(v1NormalPrime,v1TransversalPrime);
+        Vector2D wypadkowy2 = Vector2DMath.vector2DSum(v2NormalPrime,v2TransversalPrime);
+
+        if(ball1.isWall()){
+            ball2.setVelocity(Vector2DMath.vector2DSubtract(wypadkowy1,wypadkowy2));
+        }
+
+        else if(ball2.isWall()){
+            ball1.setVelocity(Vector2DMath.vector2DSubtract(wypadkowy2,wypadkowy1));
+        }
+        else {
+            ball1.setVelocity(v1NormalPrime.addVector2D(v1TransversalPrime));
+            ball2.setVelocity(v2NormalPrime.addVector2D(v2TransversalPrime));
+        }
+
 
     }
 

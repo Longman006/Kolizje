@@ -66,10 +66,6 @@ public class Line {
 
     public Vector2D getClosestPointOnLine(Vector2D point0){
         Line perpendicualar = new Line(-BB,AA,-BB*point0.getX()+AA*point0.getY());
-        System.out.println("prostopadla linia");
-        System.out.println(perpendicualar.toString());
-        System.out.println("zwyklalinia");
-        System.out.println(this.toString());
         double norm = AA*AA + BB*BB;
         double xx = (CC*AA-perpendicualar.getCC()*BB)/norm;
         double yy = (getCC()*AA-CC*BB)/norm;

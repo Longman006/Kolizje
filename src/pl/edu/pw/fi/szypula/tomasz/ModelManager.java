@@ -59,12 +59,12 @@ public class ModelManager {
         ball = new Ball(new Vector2D(Vector2DMath.vector2DSum(position,new Vector2D(100,0))),15,new Vector2D(-2,-1));
         ballList.add(ball);
 
-       // ball = new Ball(new Vector2D(Vector2DMath.vector2DSum(position,new Vector2D(0,100))),15,new Vector2D(-2,-1));
+        ball = new Ball(new Vector2D(Vector2DMath.vector2DSum(position,new Vector2D(0,100))),15,new Vector2D(-2,-1));
+
+        ballList.add(ball);
+        ball = new Ball(new Vector2D(Vector2DMath.vector2DSum(position,new Vector2D(100,100))),15,new Vector2D(5,-1));
         //
-        //ballList.add(ball);
-       // ball = new Ball(new Vector2D(Vector2DMath.vector2DSum(position,new Vector2D(100,100))),15,new Vector2D(5,-1));
-        //
-       // ballList.add(ball);
+        ballList.add(ball);
 
         generateGrid();
         generateWalls();

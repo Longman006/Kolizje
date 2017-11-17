@@ -106,20 +106,12 @@ public class CollisionManager {
             System.out.println("Collision detected ball pair "+ballPair);
 
 
-            if(ball2.isWall() ) {
-                System.out.println("Jestem tu ");
-                wallCollision(ball2,ball1);
-            }
-            else if (ball1.isWall()){
-                System.out.println("Jestem tutaj ");
-                wallCollision(ball1,ball2);
-            }
-            else{
+
                 distanceVector.normalize();
                 collisionPoint = calculateCollisionPoint(ball1,ball2);
                 correctPosition(ballPair,collisionPoint,distanceVector);
                 solveEnergyEquation(ballPair);
-            }
+
 
         }
     }
@@ -136,17 +128,27 @@ public class CollisionManager {
     private void correctPosition(Pair<Ball> ballPair, Vector2D collisionPoint, Vector2D distanceVector) {
         Vector2D ballPosition = new Vector2D(collisionPoint);
         Vector2D shiftPosition = new Vector2D(distanceVector);
+        Vector2D ball1Shift = Vector2DMath.multiplyVector2D(shiftPosition,-1*ballPair.getFirst().getRadius());
+        Vector2D ball2Shift = Vector2DMath.multiplyVector2D(shiftPosition,1*ballPair.getSecond().getRadius());
+        Vector2D newBall1Position = Vector2DMath.vector2DSum(ball1Shift,ballPosition);
+        Vector2D newBall2Position = Vector2DMath.vector2DSum(ball2Shift,ballPosition);
 
-        ballPosition.addVector2D(Vector2DMath.multiplyVector2D(shiftPosition, -1 * ballPair.getFirst().getRadius()));
-        if(!ballPair.getFirst().isWall()) {
-            ballPair.getFirst().setPosition(ballPosition);
+        System.out.println("ballPair: "+ballPair);
+        System.out.println("collisionpoint"+ collisionPoint);
+        System.out.println("shiftPosition"+ shiftPosition);
+        System.out.println("newBall1Position"+newBall1Position);
+        System.out.println("newBall2Position"+newBall2Position);
+
+        if(ballPair.getFirst().isWall()) {
+            ballPair.getSecond().setPosition(Vector2DMath.vector2DSum(newBall2Position,Vector2DMath.multiplyVector2D(ball1Shift,-1)));
         }
         
-        ballPosition.equalsVector2D(collisionPoint);
-        ballPosition.addVector2D(Vector2DMath.multiplyVector2D(shiftPosition,1*ballPair.getSecond().getRadius()));
-        
-        if(!ballPair.getSecond().isWall()) {
-            ballPair.getSecond().setPosition(ballPosition);
+        else if(ballPair.getSecond().isWall()) {
+            ballPair.getFirst().setPosition(Vector2DMath.vector2DSum(newBall1Position,Vector2DMath.multiplyVector2D(ball2Shift,-1)));
+        }
+        else{
+            ballPair.getFirst().setPosition(newBall1Position);
+            ballPair.getSecond().setPosition(newBall2Position);
         }
 
     }
@@ -190,9 +192,9 @@ public class CollisionManager {
             relativePosition = new Vector2D(staticBall.getPosition());
             relativeVelocity = new Vector2D(staticBall.getVelocity());
 
-            relativeShift(dynamicBall,relativePosition,relativeVelocity);
+            relativeShift(dynamicBall,staticBall,relativePosition,relativeVelocity);
             if(dynamicBall.getVelocity().getLengthSquare()==0){
-                relativeShift(dynamicBall,relativePosition.multiply(-1),relativeVelocity.multiply(-1));
+                relativeShift(dynamicBall,staticBall,relativePosition.multiply(-1),relativeVelocity.multiply(-1));
                 continue;
             }
             System.out.println("po zmianie : "+ballPair);
@@ -202,33 +204,36 @@ public class CollisionManager {
             endPoint = calculateEndPoint( dynamicBall);
             System.out.println("endPoint : "+endPoint);
             closestPoint=calculateDynamicCollisionClosestPoint(staticBall,dynamicBall,endPoint);
-            System.out.println("closedPoint : "+closestPoint);
+            System.out.println("closestPoint : "+closestPoint);
             distanceSquare = Vector2DMath.distanceSquared(closestPoint,staticBall.getPosition());
             System.out.println("distanceSquare : " + distanceSquare);
             radiiSquare=(staticBall.getRadius() + dynamicBall.getRadius())*(staticBall.getRadius() + dynamicBall.getRadius());
             maxDistanceSquare = Vector2DMath.vector2DSubtract(endPoint,dynamicBall.getPosition()).getLengthSquare();
             distanceToClosestPoint = Vector2DMath.vector2DSubtract(dynamicBall.getPosition(),closestPoint).getLengthSquare();
 
-            System.out.println("Distance to closest point : "+ distanceToClosestPoint);
+            System.out.println("Distance to closest point squared : "+ distanceToClosestPoint);
             System.out.println("MaxDistance : "+ maxDistanceSquare);
 
             //Nie będzie zderzenia
-            if(distanceSquare > radiiSquare && maxDistanceSquare<distanceToClosestPoint){
-                relativeShift(dynamicBall,relativePosition.multiply(-1),relativeVelocity.multiply(-1));
+            if(distanceSquare > radiiSquare || maxDistanceSquare<distanceToClosestPoint){
+                relativeShift(dynamicBall,staticBall,relativePosition,relativeVelocity);
                 System.out.println("Za daleko nie ma zderzenia , powrot :"+ballPair);
 
                 continue;
             }
             shift = Math.sqrt((staticBall.getRadius()+dynamicBall.getRadius())*(staticBall.getRadius()+dynamicBall.getRadius())-distanceSquare);
             shiftVector = new Vector2D(dynamicBall.getVelocity()).normalize().multiply(shift*(-1));
+            System.out.println("Shift Vector : "+shiftVector);
 
             //Nowa pozycja ruchomej kulki
             newPosition = Vector2DMath.vector2DSum(closestPoint,shiftVector);
             dynamicBall.setPosition(newPosition);
+            System.out.println("New position : "+newPosition);
 
 
             //Powrot do normalnego ukladu odniesienia
-            relativeShift(dynamicBall,relativePosition.multiply(-1),relativeVelocity.multiply(-1));
+            relativeShift(dynamicBall,staticBall,relativePosition,relativeVelocity);
+            System.out.println("znowu po zmianie : "+ballPair);
 
             //ustalenie predkosci
             System.out.println("Zmieniam predkosci");
@@ -237,9 +242,21 @@ public class CollisionManager {
         }
     }
 
-    private void relativeShift(Ball dynamicBall, Vector2D relativePosition, Vector2D relativeVelocity) {
-        dynamicBall.shiftPosition(Vector2DMath.multiplyVector2D(relativePosition,-1));
-        dynamicBall.shiftVelocity(Vector2DMath.multiplyVector2D(relativeVelocity,-1));
+    private void relativeShift(Ball dynamicBall,Ball staticBall, Vector2D relativePosition, Vector2D relativeVelocity) {
+
+        if(staticBall.getVelocity().getLengthSquare()!=0){
+            dynamicBall.shiftPosition(Vector2DMath.multiplyVector2D(relativePosition,-1));
+            dynamicBall.shiftVelocity(Vector2DMath.multiplyVector2D(relativeVelocity,-1));
+            staticBall.shiftPosition(Vector2DMath.multiplyVector2D(relativePosition,-1));
+            staticBall.shiftVelocity(Vector2DMath.multiplyVector2D(relativeVelocity,-1));
+        }
+        else{
+            dynamicBall.shiftPosition(Vector2DMath.multiplyVector2D(relativePosition,1));
+            dynamicBall.shiftVelocity(Vector2DMath.multiplyVector2D(relativeVelocity,1));
+            staticBall.shiftPosition(Vector2DMath.multiplyVector2D(relativePosition,1));
+            staticBall.shiftVelocity(Vector2DMath.multiplyVector2D(relativeVelocity,1));
+        }
+
     }
 
     private Vector2D calculateEndPoint(Ball dynamicBall) {

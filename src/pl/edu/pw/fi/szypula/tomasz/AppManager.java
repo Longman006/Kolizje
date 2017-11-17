@@ -24,8 +24,8 @@ public class AppManager extends Application{
 
         GraphicsManager graphicsManager = new GraphicsManager();
         double deltaTime =1;
-        double maxDeltaPosition = 90;
-        ModelManager modelManager = new ModelManager(new Vector2D(),new Vector2D(900,1200),maxDeltaPosition,deltaTime);
+        double maxDeltaPosition = 60;
+        ModelManager modelManager = new ModelManager(new Vector2D(),new Vector2D(600,720),maxDeltaPosition,deltaTime);
         List<Drawable> drawables = new ArrayList<>();
 
         /**
@@ -57,8 +57,8 @@ public class AppManager extends Application{
                     drawPair(ballPair,graphicsManager.getGraphicsContext());
                 }
                 modelManager.createCollisionPairs();
-               // modelManager.staticCollision();
-                modelManager.dynamicCollsion();
+                modelManager.staticCollision();
+               // modelManager.dynamicCollsion();
                 modelManager.updatePosition(deltaTime);
 
 
